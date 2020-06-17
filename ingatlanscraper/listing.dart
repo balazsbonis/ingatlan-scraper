@@ -25,7 +25,7 @@ class Listing {
         .replaceAll(' ', '')
         .trim());
     plotSize = double.parse(plotSizeOnPage.text
-        .replaceAll('m² terület', '')
+        .replaceAll('m² telek', '')
         .replaceAll(' ', '')
         .trim());
   }
@@ -36,6 +36,13 @@ class Listing {
   String toString() {
     return "$price @ $dwellingSize m² = ${sizeAdjustedPrice()}";
   }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'price': price,
+        'dwellingSize': dwellingSize,
+        'plotSize': plotSize
+      };
 
   static Future<Collection<Listing>> scrape(
       String startLink, String settlement) async {

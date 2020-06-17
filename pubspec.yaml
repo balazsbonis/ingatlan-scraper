@@ -5,3 +5,5 @@ dependencies:
   queries: ^0.1.14
   gsheets: ^0.2.4
   stats: ^1.0.0
+  database: any
+  database_adapter_postgre: any

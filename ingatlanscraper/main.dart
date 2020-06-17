@@ -1,12 +1,13 @@
 import 'package:gsheets/gsheets.dart';
 import 'package:stats/stats.dart';
 import 'listing.dart';
- 
+import 'repository.dart';
+
 /*
 database:
 Settlements<id, name>
-Scrape<id, settlementid, createddate, raw>
-Stats<id, scrapeid, meanprice, medianprice, distributionprice, meansize, 
+Scrapes<id, settlementid, createddate, raw>
+Stats<id, scrapeid, meanprice, medianprice, distributionprice, meandwellingsize, meanplotsize>
 
 Index: Scrape_createddate
 */
@@ -16,7 +17,7 @@ Spreadsheet ss;
 Future saveToGSheets(String settlement, List<double> values) async {
   if (ss == null) {
     const _credentials = r'''
-     
+    
     ''';
     const _spreadSheetId = '1XBov7Ca3kzOKHj-SVUaPcwbJQ3nwLCVWeGyhF1evHx4';
     final gsheets = GSheets(_credentials);
@@ -57,44 +58,36 @@ Future saveToGSheets(String settlement, List<double> values) async {
 }
 
 void main() async {
-  var settlements = [
-    'veroce',
-    'kismaros',
-    'nagymaros',
-    'zebegeny',
-    'szokolya',
-    'szodliget',
-    'iii-ker',
-    'x-ker',
-    'xv-ker',
-    'xvi-ker',
-    'xvii-ker',
-    'xx-ker',
-    'god',
-    'balatonfoldvar',
-    'encs',
-    'urom',
-    'alsonemedi',
-    // 'szentendre',
-    'dunakeszi',
-    'szod',
-    'vac',
-    // 'telki'
-  ];
-  Stopwatch stopwatch = new Stopwatch();
-  stopwatch.start();
-  for (int i = 0; i < settlements.length; i++) {
-    var scrapeResult = await Listing.scrape(
-        'https://ingatlan.com/lista/elado+haz+', settlements[i]);
-    var data = scrapeResult.where((x) => x.settlement == settlements[i]);
-    var sizeAdjustedPrices = data.select((x) => x.sizeAdjustedPrice());
-    final stats = Stats.fromData(sizeAdjustedPrices.toList());
-    await saveToGSheets(settlements[i], [
-      stats.average * 1000000,
-      stats.median * 1000000,
-      stats.standardDeviation * 1000000
-    ]);
+  try {
+    var repo = new Repository();
+    await repo.init();
+    var settlements = await repo.getSettlements();
+    Stopwatch stopwatch = new Stopwatch();
+    stopwatch.start();
+    for (int i = 0; i < settlements.length; i++) {
+      var scrapeResult = await Listing.scrape(
+          'https://ingatlan.com/lista/elado+haz+', settlements[i]['Name']);
+      var data =
+          scrapeResult.where((x) => x.settlement == settlements[i]['Name']);
+      var scrapeId = await repo.insertScrape(settlements[i]['Id'], data);
+      var sizeAdjustedPrices = data.select((x) => x.sizeAdjustedPrice());
+      final stats = Stats.fromData(sizeAdjustedPrices.toList());
+      await repo.insertStats(scrapeId, {
+        'meanPrice': stats.average,
+        'medianPrice': stats.median,
+        'distributionPrice': stats.standardDeviation,
+        'meanDwellingSize': scrapeResult.select((arg1) => arg1.dwellingSize).average(),
+        'meanPlotSize': scrapeResult.select((arg1) => arg1.plotSize).average()
+      });
+      await saveToGSheets(settlements[i]['Name'], [
+        stats.average * 1000000,
+        stats.median * 1000000,
+        stats.standardDeviation * 1000000
+      ]);
+    }
+    stopwatch.stop();
+    print("Execution took ${stopwatch.elapsed}");
+  } catch (e) {
+    print(e);
   }
-  stopwatch.stop();
-  print("Execution took ${stopwatch.elapsed}");
 }
