@@ -65,11 +65,5 @@ class Listing {
       pageCounter++;
     }
     return allListings;
-    // print(settlement);
-    // print('Average price (M): ' +
-    //     allListings.select((x) => x.price).average().toString());
-    // print('Average size adjusted price (M): ' +
-    //     allListings.select((x) => x.sizeAdjustedPrice()).average().toString());
-    //print(allListings);
   }
 }

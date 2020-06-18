@@ -22,10 +22,22 @@ class Repository {
   }
 
   Future<List<Map<String, Object>>> getSettlements() async {
-    final settlements = _db.sqlClient
+    final settlements = await _db.sqlClient
         .table('Settlements')
         .select(columnNames: ['Id', 'Name']).toMaps();
     return settlements;
+  }
+
+  Future<List<Map<String, Object>>> getToplist({ String date }) async {
+    var currentDate =
+        "${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}";
+    final toplist = await _db.sqlClient
+        .table('Toplist')
+        .whereColumn('Created', equals: currentDate)
+        .ascending('MedianPrice')
+        .select(
+            columnNames: ['Name', 'MedianPrice', 'MeanDwellingSize']).toMaps();
+    return toplist;
   }
 
   Future<int> insertScrape(int id, IEnumerable<Listing> scrape) async {
@@ -46,15 +58,15 @@ class Repository {
     return 0;
   }
 
-  Future insertStats(int scrapeId, Map<String, double> stats) async{
-    await _db.sqlClient.table('Stats')
-      .insert({
-        'ScrapeId': scrapeId,
-        'MeanPrice': stats['meanPrice'],
-        'MedianPrice': stats['medianPrice'],
-        'DistributionPrice': stats['distributionPrice'],
-        'MeanDwellingSize': stats['meanDwellingSize'],
-        'MeanPlotSize': stats['meanPlotSize']
-      });
+  Future insertStats(int scrapeId, Map<String, double> stats) async {
+    await _db.sqlClient.table('Stats').insert({
+      'ScrapeId': scrapeId,
+      'MeanPrice': stats['meanPrice'],
+      'MedianPrice': stats['medianPrice'],
+      'DistributionPrice': stats['distributionPrice'],
+      'MeanDwellingSize': stats['meanDwellingSize'],
+      'MeanPlotSize': stats['meanPlotSize'],
+      'ListingCount': stats['listingCount']
+    });
   }
 }
