@@ -24,6 +24,7 @@ class Repository {
   Future<List<Map<String, Object>>> getSettlements() async {
     final settlements = await _db.sqlClient
         .table('Settlements')
+        .whereColumn('Enabled', equals: true)
         .select(columnNames: ['Id', 'Name']).toMaps();
     return settlements;
   }

@@ -19,6 +19,7 @@ class GSheetHelper {
     try {
       await init();
       var sheet = ss.worksheetByTitle('Median');
+      sheet ??= await ss.addWorksheet('Median');
       var currentDate =
           "${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}";
       var dateColumn = await sheet.values.column(1);
@@ -34,7 +35,7 @@ class GSheetHelper {
         column = settlementRow.length + 1;
         await sheet.values.insertValue(settlement, column: column, row: 1);
       }
-      print("Inserting $median to $column-$row.");
+      print("   > Inserting $median to $column-$row.");
       await sheet.values.insertValue(median, column: column, row: row);
     } catch (e) {
       print(e);
@@ -45,14 +46,14 @@ class GSheetHelper {
     try {
       await init();
       var sheet = ss.worksheetByTitle('Toplist');
-
+      sheet ??= await ss.addWorksheet('Toplist');
       for (int i = 0; i < toplist.length; i++) {
         var record = toplist[i];
-        await sheet.values.insertValue(record['Name'], column: 1, row: i + 2);
-        await sheet.values
-            .insertValue(record['MedianPrice'], column: 2, row: i + 2);
-        await sheet.values
-            .insertValue(record['MeanDwellingSize'], column: 3, row: i + 2);
+        await sheet.values.insertRow(i + 2, [
+          record['Name'],
+          record['MedianPrice'],
+          record['MeanDwellingSize']
+        ]);
       }
     } catch (e) {
       print(e);

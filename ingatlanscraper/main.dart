@@ -21,7 +21,7 @@ void main() async {
       var scrapeId = await repo.insertScrape(settlements[i]['Id'], data);
       var stats =
           Stats.fromData(data.select((x) => x.sizeAdjustedPrice()).toList());
-      print("Stats - $stats");
+      print("   > Stats - $stats");
       await repo.insertStats(scrapeId, {
         'meanPrice': stats.average,
         'medianPrice': stats.median,
