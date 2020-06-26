@@ -11,11 +11,11 @@ class Repository {
 
   Future init() async {
     final config = Postgre(
-      host: 'localhost',
+      host: '34.107.48.206',
       port: 5432,
       user: 'postgres',
       password: 'Karthago36',
-      databaseName: 'ingatlan-scraper',
+      databaseName: 'postgres',
     );
 
     _db = config.database();
