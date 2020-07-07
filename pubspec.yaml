@@ -1,9 +1,0 @@
-name: ingatlanscraper
-dependencies:
-  http: ^0.12.0
-  html: ^0.13.3+3
-  queries: ^0.1.14
-  gsheets: ^0.2.4
-  stats: ^1.0.0
-  database: any
-  database_adapter_postgre: any
