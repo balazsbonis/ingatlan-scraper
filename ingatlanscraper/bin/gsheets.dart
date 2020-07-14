@@ -7,7 +7,7 @@ class GSheetHelper {
 
   Future init() async {
     if (ss == null) {
-      final _credFile = new File('c:\\Work\\agglomeracio-gsheet.cred');
+      final _credFile = new File('.\\agglomeracio-gsheet.cred');
       final _credentials = _credFile.readAsStringSync();
       const _spreadSheetId = '1XBov7Ca3kzOKHj-SVUaPcwbJQ3nwLCVWeGyhF1evHx4';
       final gsheets = GSheets(_credentials);

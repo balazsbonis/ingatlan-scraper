@@ -4,13 +4,21 @@ import 'listing.dart';
 import 'repository.dart';
 
 class Scraper {
-  final repo = new Repository();
+  final ARepository repo;
   final sheet = new GSheetHelper();
 
-  void scrape() async {
+  Scraper(this.repo);
+
+  void scrape({String settlementName}) async {
     try {
       await repo.init();
-      var settlements = await repo.getSettlements();
+      var settlements = new List<Map<String, Object>>();
+      if (settlementName == null) {
+        settlements = await repo.getSettlements();
+      }
+      else {
+        settlements.add(await repo.getSettlementByName(settlementName));
+      }
       Stopwatch stopwatch = new Stopwatch();
       stopwatch.start();
       for (int i = 0; i < settlements.length; i++) {

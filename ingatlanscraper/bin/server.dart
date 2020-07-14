@@ -1,5 +1,5 @@
-// gcloud builds submit --tag gcr.io/ingatlan-scraper-dart/helloworld
-// gcloud beta run deploy --image gcr.io/ingatlan-scraper-dart/helloworld
+// gcloud builds submit --tag gcr.io/ingatlan-scraper-dart/scraper
+// gcloud beta run deploy --image gcr.io/ingatlan-scraper-dart/scraper
 
 import 'dart:convert';
 import 'dart:io';
@@ -7,9 +7,10 @@ import 'dart:io';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart';
 
-import 'cloudsqlrepository.dart';
+import 'repository.dart';
+import 'scraper.dart';
 
-final repository = new CloudSqlRepository();
+final repository = new Repository();
 
 Future main() async {
   await repository.init();
@@ -32,8 +33,8 @@ Future<Response> handleRequest(Request request) async {
   try {
     if (request.method == 'GET') {
       return await handleGet(request);
-    } else {
-      // ···
+    } else if (request.method == 'POST') {
+      return await handlePost(request);
     }
   } catch (e) {
     print('Exception in handleRequest: $e');
@@ -50,7 +51,7 @@ Future<Response> handleGet(Request request) async {
   } else if (request.url.queryParameters.containsKey('ping')) {
     var ping = request.url.queryParameters['ping'];
     return Response.ok('Ping: $ping');
-  } else if (request.url.queryParameters.containsKey('settlement')){
+  } else if (request.url.queryParameters.containsKey('settlement')) {
     var settlementName = request.url.queryParameters['settlement'];
     var test = await repository.existsSettlement(settlementName);
     return Response.ok(test.toString());
@@ -63,7 +64,23 @@ Future<Response> handleGet(Request request) async {
     } else {
       return Response.notFound('Unknown settlement');
     }
-  } else {
-    return Response.forbidden('Unkonwn query');
   }
+  return Response.forbidden('Unknown query');
+}
+
+Future<Response> handlePost(Request request) async {
+  if (request.url.queryParameters.length == 0) {
+    return Response.forbidden('Not allowed.');
+  } else if (request.url.queryParameters.containsKey('settlement')) {
+    var settlementName = request.url.queryParameters['settlement'];
+    var test = await repository.existsSettlement(settlementName);
+    if (!test) {
+      await repository.insertSettlement(settlementName);
+    }
+    var scraper = new Scraper(repository);
+    await scraper.scrape(settlementName: settlementName);
+    var stats = await repository.getStatsForSettlement(settlementName);
+    return Response.ok(json.encode(stats));
+  }
+  return Response.forbidden('Unknown query');
 }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:database/database.dart';
 import 'package:database_adapter_postgre/database_adapter_postgre.dart';
@@ -8,11 +9,16 @@ import 'listing.dart';
 
 abstract class ARepository {
   Future init();
+
   Future<List<Map<String, Object>>> getSettlements();
-  Future<bool> existsSettlement(String settlement);
-  Future<Map<String, Object>> getStatsForSettlement(String settlementName);
+  Future<bool> existsSettlement(String settlementName);
+  Future<Map<String, Object>> getSettlementByName(String settlementName);
+  Future<int> insertSettlement(String settlementName);
+
   Future<List<Map<String, Object>>> getToplist({String date});
   Future<int> insertScrape(int id, IEnumerable<Listing> scrape);
+
+  Future<Map<String, Object>> getStatsForSettlement(String settlementName);
   Future insertStats(int scrapeId, Map<String, double> stats);
 }
 
@@ -21,8 +27,13 @@ class Repository implements ARepository {
 
   @override
   Future init() async {
+    final configFile = json.decode(File('.\\database.cred').readAsStringSync());
     final config = Postgre(
-
+      host: configFile['host'],
+      port: int.parse(configFile['port']),
+      user: configFile['username'],
+      password: configFile['password'],
+      databaseName: configFile['databaseName'],
     );
 
     _db = config.database();
@@ -38,12 +49,34 @@ class Repository implements ARepository {
   }
 
   @override
-  Future<bool> existsSettlement(String settlement) async {
+  Future<Map<String, Object>> getSettlementByName(String settlementName) async {
     final settlements = await _db.sqlClient
         .table('Settlements')
-        .whereColumn('Name', equals: settlement)
-        .select(columnNames: ['Id', 'Name']).toMaps();
-    return settlements.length > 0;
+        .whereColumn('Name', equals: settlementName)
+        .select(columnNames: ['Id', 'Name', 'County', 'Enabled']).toMaps();
+    return settlements.length > 0 ? settlements.first : null;
+  }
+
+  @override
+  Future<bool> existsSettlement(String settlementName) async {
+    var settlement = await getSettlementByName(settlementName);
+    return settlement != null;
+  }
+
+  @override
+  Future<int> insertSettlement(String settlementName) async {
+    final re = await _db.sqlClient
+        .table('Settlements')
+        .insert({'Name': settlementName, 'Enabled': false});
+    if (re.affectedRows > 0) {
+      var result = await _db.sqlClient
+          .table('Settlements')
+          .whereColumn('Name', equals: settlementName)
+          .select(columnNames: ['Id']).toMaps();
+
+      return result.last['Id'];
+    }
+    return 0;
   }
 
   @override
@@ -117,4 +150,5 @@ class Repository implements ARepository {
       'ListingCount': stats['listingCount']
     });
   }
+
 }
