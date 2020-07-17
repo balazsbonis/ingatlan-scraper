@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:database/database.dart';
-import 'package:database_adapter_postgre/database_adapter_postgre.dart';
 import 'package:queries/collections.dart';
 
 import 'listing.dart';
@@ -22,21 +20,21 @@ abstract class ARepository {
   Future insertStats(int scrapeId, Map<String, double> stats);
 }
 
-class Repository implements ARepository {
-  Database _db;
+/*class Repository implements ARepository {
+  // Database _db;
 
   @override
   Future init() async {
     final configFile = json.decode(File('.\\database.cred').readAsStringSync());
-    final config = Postgre(
-      host: configFile['host'],
-      port: int.parse(configFile['port']),
-      user: configFile['username'],
-      password: configFile['password'],
-      databaseName: configFile['databaseName'],
-    );
+    // final config = Postgre(
+    //   host: configFile['host'],
+    //   port: int.parse(configFile['port']),
+    //   user: configFile['username'],
+    //   password: configFile['password'],
+    //   databaseName: configFile['databaseName'],
+    // );
 
-    _db = config.database();
+    // _db = config.database();
   }
 
   @override
@@ -152,3 +150,4 @@ class Repository implements ARepository {
   }
 
 }
+*/

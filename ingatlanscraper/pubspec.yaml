@@ -1,5 +1,8 @@
 name: ingatlan_scraper_dart
 private: True
+version: 0.0.1
+description: Ingatlan.com scraper
+author: blas3nik
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -10,7 +13,5 @@ dependencies:
   queries: ^0.1.14
   gsheets: ^0.2.4
   stats: ^1.0.0
-  database: any
-  database_adapter_postgre: any
   shelf: ^0.7.3
-  postgres: ^2.1.1
+  aqueduct: ^4.0.0-b1

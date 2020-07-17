@@ -1,14 +1,14 @@
 import 'dart:convert';
 
-import 'cloudsqlrepository.dart';
+import 'repository.dart';
 import 'scraper.dart';
 
 void main() async {
 
-  var scraper = new Scraper();
-  await scraper.scrape();
+  //var scraper = new Scraper(new Repository());
+  //await scraper.scrape();
   
-  // var repo = new CloudSqlRepository();
+  // var repo = new Repository();
   // await repo.init();
 //   var settlements = await repo.getSettlements();
 //   for (var s in settlements) print(s['Name']);
