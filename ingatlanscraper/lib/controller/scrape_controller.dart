@@ -9,11 +9,13 @@ import 'package:ingatlan_scraper_dart/service/listing.dart';
 import 'package:stats/stats.dart';
 
 class ScrapeController extends ResourceController {
-  final ManagedContext context;
+  ManagedContext context;
+  ScraperConfiguration configuration;
+  GSheetHelper gsheets;
 
-  final GSheetHelper gsheets = new GSheetHelper();
-
-  ScrapeController(this.context);
+  ScrapeController(this.context, this.configuration){
+    gsheets = new GSheetHelper(configuration);
+  }
 
   @Operation.get()
   Future<Response> getAllScrapes() async {

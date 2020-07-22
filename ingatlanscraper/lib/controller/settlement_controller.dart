@@ -15,8 +15,7 @@ class SettlementController extends ResourceController {
 
   @Operation.get('id')
   Future<Response> getSettlementByID(@Bind.path('id') int id) async {
-    final qry = Query<Settlement>(context)
-      ..where((h) => h.id).equalTo(id);
+    final qry = Query<Settlement>(context)..where((h) => h.id).equalTo(id);
 
     final settlement = await qry.fetchOne();
 
@@ -25,5 +24,17 @@ class SettlementController extends ResourceController {
     }
     return Response.ok(settlement);
   }
-  
+
+  @Operation.post()
+  Future<Response> createSettlement() async {
+    final Map<String, dynamic> body = await request.body.decode();
+    
+    final qry = Query<Settlement>(context)
+      ..values.name = body['name'] as String
+      ..values.county = body['county'] as String
+      ..values.enabled = body['enabled'] as bool;
+    final settlement = await qry.insert();
+
+    return Response.ok(settlement);
+  }
 }

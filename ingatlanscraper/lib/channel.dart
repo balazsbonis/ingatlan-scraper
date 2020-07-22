@@ -1,11 +1,13 @@
 import 'package:ingatlan_scraper_dart/controller/scrape_controller.dart';
 import 'package:ingatlan_scraper_dart/controller/settlement_controller.dart';
 import 'package:ingatlan_scraper_dart/controller/stat_controller.dart';
+import 'package:ingatlan_scraper_dart/service/gsheets.dart';
 
 import 'ingatlan_scraper_dart.dart';
 
 class CloudRunAppChannel extends ApplicationChannel {
   ManagedContext context;
+  ScraperConfiguration config;
 
   /// Initialize services in this method.
   ///
@@ -17,10 +19,18 @@ class CloudRunAppChannel extends ApplicationChannel {
   Future prepare() async {
     logger.onRecord.listen(
         (rec) => print("$rec ${rec.error ?? ""} ${rec.stackTrace ?? ""}"));
-
+    if (options.configurationFilePath == null) {
+      // locally from VSCode
+      options.configurationFilePath = './/config.yaml';
+    }
+    config = ScraperConfiguration(options.configurationFilePath);
     final dataModel = ManagedDataModel.fromCurrentMirrorSystem();
     final persistentStore = PostgreSQLPersistentStore.fromConnectionInfo(
-        "postgres", "Karthago36", "34.107.48.206", 5432, "ingatlanscraper");
+        config.database.username,
+        config.database.password,
+        config.database.host,
+        config.database.port,
+        config.database.databaseName);
 
     context = ManagedContext(dataModel, persistentStore);
   }
@@ -35,10 +45,20 @@ class CloudRunAppChannel extends ApplicationChannel {
   Controller get entryPoint {
     final router = Router();
 
-    router.route("/settlement/[:id]").link(() => SettlementController(context));
-    router.route("/scrape/[:settlementId]").link(() => ScrapeController(context));
-    router.route("/stat/[:id]").link(() => StatController(context));
+    router.route("/settlement[/:id]").link(() => SettlementController(context));
+    router
+        .route("/scrape[/:settlementId]")
+        .link(() => ScrapeController(context, config));
+    router.route("/stat[/:id]").link(() => StatController(context));
 
     return router;
   }
+}
+
+class ScraperConfiguration extends Configuration {
+  ScraperConfiguration(String path) : super.fromFile(File(path));
+
+  DatabaseConfiguration database;
+  String spreadSheetId;
+  String spreadSheetToken;
 }
