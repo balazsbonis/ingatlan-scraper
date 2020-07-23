@@ -13,7 +13,7 @@ class GSheetHelper {
   Future init() async {
     if (ss == null) {
       final _spreadSheetId = configuration.spreadSheetId;
-      final gsheets = GSheets(json.encode(configuration.spreadSheetToken));
+      final gsheets = GSheets(configuration.spreadSheetToken);
       ss = await gsheets.spreadsheet(_spreadSheetId);
     }
   }
