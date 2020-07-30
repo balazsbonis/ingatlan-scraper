@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:http/http.dart';
 
 Future main() async {
+  var stopwatch = Stopwatch();
+  stopwatch.start();
   var client = Client();
   var settlementResults = await client
           .get("https://scraper-densponx3q-ez.a.run.app/settlement");
@@ -13,6 +15,8 @@ Future main() async {
     print("Starting ${e['name']}(${e['county']}) @ ${e['id']}");
     var scrapeResult = await client.post('https://scraper-densponx3q-ez.a.run.app/scrape/${e['id']}');
     var scrape = json.decode(scrapeResult.body);
-    print(scrape['Stats']);
+    print("  ${scrape['Stats']}");
   }
+  stopwatch.stop();
+  print("Execution took ${stopwatch.elapsed.toString()}");
 }

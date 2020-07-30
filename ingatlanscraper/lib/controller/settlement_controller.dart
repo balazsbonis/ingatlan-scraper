@@ -8,7 +8,8 @@ class SettlementController extends ResourceController {
 
   @Operation.get()
   Future<Response> getAllSettlements() async {
-    final qry = Query<Settlement>(context);
+    final qry = Query<Settlement>(context)
+      ..sortBy((x) => x.id, QuerySortOrder.ascending);
     final entities = await qry.fetch();
     return Response.ok(entities);
   }
@@ -28,13 +29,25 @@ class SettlementController extends ResourceController {
   @Operation.post()
   Future<Response> createSettlement() async {
     final Map<String, dynamic> body = await request.body.decode();
-    
+
     final qry = Query<Settlement>(context)
       ..values.name = body['name'] as String
       ..values.county = body['county'] as String
       ..values.enabled = body['enabled'] as bool;
-    final settlement = await qry.insert();
+      
+    return Response.ok(await qry.insert());
+  }
 
-    return Response.ok(settlement);
+  @Operation.put()
+  Future<Response> updateSettlement() async {
+    final Map<String, dynamic> body = await request.body.decode();
+    final name = body['name'] as String;
+
+    final qry = Query<Settlement>(context)
+      ..where((h) => h.name).equalTo(name)
+      ..values.county = body['county'] as String
+      ..values.enabled = body['enabled'] as bool;
+
+    return Response.ok(await qry.updateOne());
   }
 }
