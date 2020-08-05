@@ -19,7 +19,7 @@ class Listing {
     var dwellingSizeOnPage = element.querySelector('.listing__data--area-size');
     var plotSizeOnPage = element.querySelector('.listing__data--plot-size');
     price = double.parse(
-        priceOnPage.text.replaceAll('M Ft', '').replaceAll(' ', '').trim());
+        priceOnPage.text.split('M Ft')[0].replaceAll(' ', '').trim());
     dwellingSize = double.parse(dwellingSizeOnPage.text
         .replaceAll('m² terület', '')
         .replaceAll(' ', '')
@@ -53,14 +53,18 @@ class Listing {
     while (true) {
       // random throttle
       Random random = new Random();
-      sleep(new Duration(milliseconds: 1000 + random.nextInt(500)));
+      sleep(new Duration(milliseconds: 500 + random.nextInt(500)));
       var response = await client
           .get("$startLink$settlement?page=${pageCounter.toString()}");
       var document = parse(response.body);
       var listings = document.querySelectorAll('.listing');
       if (listings.length == 0) break;
       for (var listing in listings) {
-        allListings.add(new Listing(settlement, listing));
+        try {
+          allListings.add(new Listing(settlement, listing));
+        } catch (e) {
+          print("$e on ${pageCounter}.");
+        }
       }
       pageCounter++;
     }

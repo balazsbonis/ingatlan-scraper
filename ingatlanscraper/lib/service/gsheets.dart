@@ -1,16 +1,19 @@
-import 'dart:io';
+import 'dart:convert';
 
 import 'package:gsheets/gsheets.dart';
+import 'package:ingatlan_scraper_dart/ingatlan_scraper_dart.dart';
+
 
 class GSheetHelper {
+  GSheetHelper(this.configuration);
+  ScraperConfiguration configuration;
+
   Spreadsheet ss;
 
   Future init() async {
     if (ss == null) {
-      final _credFile = new File('c:\\Work\\agglomeracio-gsheet.cred');
-      final _credentials = _credFile.readAsStringSync();
-      const _spreadSheetId = '1XBov7Ca3kzOKHj-SVUaPcwbJQ3nwLCVWeGyhF1evHx4';
-      final gsheets = GSheets(_credentials);
+      final _spreadSheetId = configuration.spreadSheetId;
+      final gsheets = GSheets(configuration.spreadSheetToken);
       ss = await gsheets.spreadsheet(_spreadSheetId);
     }
   }
