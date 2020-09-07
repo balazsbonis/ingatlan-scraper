@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart';
 
@@ -8,6 +9,12 @@ Future main() async {
   var client = Client();
   var settlementResults = await client
           .get("https://scraper-densponx3q-ez.a.run.app/settlement");
+  if (settlementResults.body == ""){
+    // wait a sec and retry. The Cloud run has to start up
+    sleep(new Duration(seconds: 1));
+    settlementResults = await client
+          .get("https://scraper-densponx3q-ez.a.run.app/settlement");
+  }
   var settlements = json.decode(settlementResults.body);
   var enabledOnes = (settlements as List<dynamic>).where((element) => element['enabled']).toList();
   print("Found ${enabledOnes.length} settlements");
