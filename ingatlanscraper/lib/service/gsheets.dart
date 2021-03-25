@@ -18,11 +18,11 @@ class GSheetHelper {
     }
   }
 
-  Future saveMedian(String settlement, double median) async {
+  Future saveMedian(String sheetName, String settlement, double median) async {
     try {
       await init();
-      var sheet = ss.worksheetByTitle('Median');
-      sheet ??= await ss.addWorksheet('Median');
+      var sheet = ss.worksheetByTitle(sheetName);
+      sheet ??= await ss.addWorksheet(sheetName);
       var currentDate =
           "${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}";
       var dateColumn = await sheet.values.column(1);

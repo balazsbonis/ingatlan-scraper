@@ -6,7 +6,7 @@
     "configurations": [
         {
             "name": "Dart",
-            "program": "ingatlanscraper/bin/program.dart",
+            "program": "ingatlanscraper/bin/server.dart",
             "request": "launch",
             "type": "dart"
         }

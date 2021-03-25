@@ -33,7 +33,8 @@ class SettlementController extends ResourceController {
     final qry = Query<Settlement>(context)
       ..values.name = body['name'] as String
       ..values.county = body['county'] as String
-      ..values.enabled = body['enabled'] as bool;
+      ..values.enabled = body['enabled'] as bool
+      ..values.sheet = body['sheet'] as String;
       
     return Response.ok(await qry.insert());
   }
@@ -46,7 +47,8 @@ class SettlementController extends ResourceController {
     final qry = Query<Settlement>(context)
       ..where((h) => h.name).equalTo(name)
       ..values.county = body['county'] as String
-      ..values.enabled = body['enabled'] as bool;
+      ..values.enabled = body['enabled'] as bool
+      ..values.sheet = body['sheet'] as String;
 
     return Response.ok(await qry.updateOne());
   }
