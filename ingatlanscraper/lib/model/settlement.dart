@@ -1,4 +1,4 @@
-import 'package:aqueduct/aqueduct.dart';
+import 'package:conduit/conduit.dart';
 
 class Settlement extends ManagedObject<_Settlement> implements _Settlement {
   Map<String, dynamic> toJson() =>

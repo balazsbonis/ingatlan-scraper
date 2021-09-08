@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:aqueduct/aqueduct.dart';   
+import 'package:conduit/conduit.dart';
 
 class Migration1 extends Migration { 
   @override

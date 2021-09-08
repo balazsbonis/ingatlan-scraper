@@ -1,4 +1,4 @@
-import 'package:aqueduct/aqueduct.dart';
+import 'package:conduit/conduit.dart';
 
 class Stat extends ManagedObject<_Stat> implements _Stat {
   Map<String, dynamic> toJson() => {

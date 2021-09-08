@@ -14,4 +14,4 @@ dependencies:
   gsheets: ^0.2.4
   stats: ^1.0.0
   shelf: ^0.7.3
-  aqueduct: ^4.0.0-b1
+  conduit: ^3.0.11

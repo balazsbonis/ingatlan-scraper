@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:gsheets/gsheets.dart';
 import 'package:ingatlan_scraper_dart/ingatlan_scraper_dart.dart';
-
 
 class GSheetHelper {
   GSheetHelper(this.configuration);

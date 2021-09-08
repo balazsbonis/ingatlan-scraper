@@ -1,4 +1,4 @@
-import 'package:aqueduct/aqueduct.dart';
+import 'package:conduit/conduit.dart';
 
 class Scrape extends ManagedObject<_Scrape> implements _Scrape {
   Map<String, dynamic> toJson() =>

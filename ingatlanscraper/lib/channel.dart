@@ -1,7 +1,6 @@
 import 'package:ingatlan_scraper_dart/controller/scrape_controller.dart';
 import 'package:ingatlan_scraper_dart/controller/settlement_controller.dart';
 import 'package:ingatlan_scraper_dart/controller/stat_controller.dart';
-import 'package:ingatlan_scraper_dart/service/gsheets.dart';
 
 import 'ingatlan_scraper_dart.dart';
 
