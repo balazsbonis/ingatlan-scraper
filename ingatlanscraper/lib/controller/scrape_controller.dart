@@ -13,7 +13,7 @@ class ScrapeController extends ResourceController {
   ScraperConfiguration configuration;
   GSheetHelper gsheets;
 
-  ScrapeController(this.context, this.configuration){
+  ScrapeController(this.context, this.configuration) {
     gsheets = new GSheetHelper(configuration);
   }
 
@@ -78,7 +78,7 @@ class ScrapeController extends ResourceController {
 
     final stat = await statsQry.insert();
 
-    await gsheets.saveMedian(settlement.name, stats.median * 1000000);
+    await gsheets.saveMedian(settlement.sheet, settlement.name, stats.median * 1000000);
     return Response.ok(
         {'Settlement': settlement, 'Scrape': scrape, 'Stats': stat});
   }
