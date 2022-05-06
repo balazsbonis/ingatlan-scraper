@@ -48,7 +48,7 @@ class CloudRunAppChannel extends ApplicationChannel {
     router
         .route("/scrape[/:settlementId]")
         .link(() => ScrapeController(context, config));
-    router.route("/stat[/:id]").link(() => StatController(context));
+    router.route("/stat[/:settlementId]").link(() => StatController(context));
 
     return router;
   }
