@@ -39,6 +39,21 @@ class ScrapeController extends ResourceController {
     return Response.ok(scrapes);
   }
 
+  @Operation.post()
+  Future<Response> multiScrape() async {
+    final Map<String, List<int>> body = await request.body.decode();
+    var result = true;
+    for (var settlementId in body['settlements']) {
+      var scrapeResult = await createScrape(settlementId);
+      result = result && scrapeResult.statusCode == 200;
+    }
+    if (result) {
+      return Response.ok(body['settlements']);
+    } else {
+      return Response.serverError();
+    }
+  }
+
   @Operation.post('settlementId')
   Future<Response> createScrape(
       @Bind.path('settlementId') int settlementId) async {
@@ -56,14 +71,14 @@ class ScrapeController extends ResourceController {
       return Response.notFound();
     }
 
+    final stats = Stats.fromData(
+        scrapeResult.select((x) => x.sizeAdjustedPrice()).toList());
+
     final qry = Query<Scrape>(context)
       ..values.created = DateTime.now()
       ..values.settlementId = settlementId
       ..values.raw = jsonEncode(scrapeResult.items);
     final scrape = await qry.insert();
-
-    final stats = Stats.fromData(
-        scrapeResult.select((x) => x.sizeAdjustedPrice()).toList());
 
     final statsQry = Query<Stat>(context)
       ..values.scrapeId = scrape.id
@@ -78,7 +93,8 @@ class ScrapeController extends ResourceController {
 
     final stat = await statsQry.insert();
 
-    await gsheets.saveMedian(settlement.sheet, settlement.name, stats.median * 1000000);
+    await gsheets.saveMedian(
+        settlement.sheet, settlement.name, stats.median * 1000000);
     return Response.ok(
         {'Settlement': settlement, 'Scrape': scrape, 'Stats': stat});
   }

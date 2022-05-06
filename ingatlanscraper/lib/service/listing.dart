@@ -24,10 +24,12 @@ class Listing {
         .replaceAll('m² terület', '')
         .replaceAll(' ', '')
         .trim());
-    plotSize = double.parse(plotSizeOnPage.text
-        .replaceAll('m² telek', '')
-        .replaceAll(' ', '')
-        .trim());
+    plotSize = plotSizeOnPage != null
+        ? double.parse(plotSizeOnPage.text
+            .replaceAll('m² telek', '')
+            .replaceAll(' ', '')
+            .trim())
+        : 0;
   }
 
   double sizeAdjustedPrice() => price / dwellingSize;
