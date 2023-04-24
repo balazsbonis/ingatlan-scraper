@@ -14,21 +14,24 @@ class Listing {
   String settlement;
 
   Listing(this.settlement, Element element) {
-    id = int.parse(element.attributes['data-id']);
-    var priceOnPage = element.querySelector('.price__container');
-    var dwellingSizeOnPage = element.querySelector('.listing__data--area-size');
-    var plotSizeOnPage = element.querySelector('.listing__data--plot-size');
-    price = double.parse(
-        priceOnPage.text.split('M Ft')[0].replaceAll(' ', '').trim());
+    id = int.parse(element.attributes['data-listing-id']);
+    var detailElement = element.querySelector('.row');
+    var spans = detailElement.querySelectorAll('span');
+    var priceOnPage = spans[0];
+    var dwellingSizeOnPage = spans[4];
+    var plotSizeOnPage = spans[6];
+    price = double.parse(priceOnPage.text
+        .replaceAll('M Ft', '')
+        .replaceAll(' ', '')
+        .replaceAll(',', '.')
+        .trim());
     dwellingSize = double.parse(dwellingSizeOnPage.text
-        .replaceAll('m² terület', '')
+        .replaceAll('m2', '')
         .replaceAll(' ', '')
         .trim());
     plotSize = plotSizeOnPage != null
-        ? double.parse(plotSizeOnPage.text
-            .replaceAll('m² telek', '')
-            .replaceAll(' ', '')
-            .trim())
+        ? double.parse(
+            plotSizeOnPage.text.replaceAll('m2', '').replaceAll(' ', '').trim())
         : 0;
   }
 
@@ -59,7 +62,7 @@ class Listing {
       var response = await client
           .get("$startLink$settlement?page=${pageCounter.toString()}");
       var document = parse(response.body);
-      var listings = document.querySelectorAll('.listing');
+      var listings = document.querySelectorAll('.listing-card');
       if (listings.length == 0) break;
       for (var listing in listings) {
         try {
